@@ -1,11 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-// import App from './App.jsx'
-import AppChat from './AppChat.jsx'
+import App from './App.jsx'
+// import AppChat from './AppChat.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AppChat />
+    <App />
   </StrictMode>,
 )

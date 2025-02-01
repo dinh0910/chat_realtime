@@ -1,12 +1,36 @@
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
-import axios from "axios"; // Thư viện gọi API
+import axios from "axios";
 
 const socket = io("http://localhost:3000");
 
 function App() {
+    const [username, setUsername] = useState(""); // Tên user hiện tại
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
+    const [users, setUsers] = useState([]); // Danh sách user online
+
+    // Kết nối và gửi username khi user nhập
+    useEffect(() => {
+        if (username) {
+            socket.emit("user_connected", username);
+
+            // Lắng nghe danh sách user online
+            socket.on("update_user_list", (onlineUsers) => {
+                setUsers(onlineUsers);
+            });
+
+            // Lấy tin nhắn mới
+            socket.on("receive_message", (newMessage) => {
+                setMessages((prev) => [...prev, newMessage]);
+            });
+        }
+
+        return () => {
+            socket.off("update_user_list");
+            socket.off("receive_message");
+        };
+    }, [username]);
 
     // Lấy lịch sử tin nhắn khi load trang
     useEffect(() => {
@@ -20,38 +44,57 @@ function App() {
         };
 
         fetchMessages();
-
-        // Lắng nghe tin nhắn mới từ server
-        socket.on("receive_message", (newMessage) => {
-            setMessages((prev) => [...prev, newMessage]);
-        });
     }, []);
 
     // Gửi tin nhắn
     const sendMessage = () => {
         if (message.trim() !== "") {
-            const newMessage = { sender: "User1", content: message }; // Gửi tin từ User1
-            socket.emit("send_message", newMessage); // Gửi tin nhắn lên server
-            setMessage(""); // Xóa nội dung input sau khi gửi
+            socket.emit("send_message", { sender: username, content: message });
+            setMessage("");
         }
     };
 
     return (
         <div>
-            <h1>Chat Realtime</h1>
-            <div>
-                {messages.map((msg, index) => (
-                    <p key={index}>
-                        <strong>{msg.sender}:</strong> {msg.content}
-                    </p>
-                ))}
-            </div>
-            <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-            />
-            <button onClick={sendMessage}>Send</button>
+            {!username ? (
+                // Form nhập username
+                <div>
+                    <h1>Enter your username</h1>
+                    <input
+                        type="text"
+                        placeholder="Your username"
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <button onClick={() => username && setUsername(username)}>
+                        Join Chat
+                    </button>
+                </div>
+            ) : (
+                // Giao diện chính của chat
+                <div>
+                    <h1>Realtime Chat</h1>
+                    <h2>Online Users</h2>
+                    <ul>
+                        {users.map((user, index) => (
+                            <li key={index}>{user}</li>
+                        ))}
+                    </ul>
+                    <div>
+                        {messages.map((msg, index) => (
+                            <p key={index}>
+                                <strong>{msg.sender}:</strong> {msg.content}
+                            </p>
+                        ))}
+                    </div>
+                    <input
+                        type="text"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="Type your message"
+                    />
+                    <button onClick={sendMessage}>Send</button>
+                </div>
+            )}
         </div>
     );
 }

@@ -9,10 +9,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173", // Cho phép truy cập từ frontend
+        origin: "http://localhost:5173",
         methods: ["GET", "POST"],
     },
 });
+
+app.use(cors());
 
 // Kết nối MongoDB
 mongoose
@@ -23,32 +25,47 @@ mongoose
     .then(() => console.log("Connected to MongoDB"))
     .catch((err) => console.error("MongoDB connection error:", err));
 
-// Cấu hình CORS cho Express
-app.use(cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true,
-}));
+// Danh sách user online
+const onlineUsers = new Map(); // Key: socket.id, Value: username
 
 // Xử lý sự kiện Socket.IO
 io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
+    // Nhận thông tin user khi kết nối
+    socket.on("user_connected", (username) => {
+        onlineUsers.set(socket.id, username); // Lưu user vào danh sách online
+        console.log(`${username} joined the chat`);
+        io.emit("update_user_list", Array.from(onlineUsers.values())); // Gửi danh sách user online tới tất cả
+    });
+
+    // Khi người dùng gửi tin nhắn
     socket.on("send_message", async (data) => {
         try {
+            const { sender, content } = data;
+
+            // Lưu tin nhắn vào MongoDB
             const newMessage = new Message({
-                sender: data.sender,
-                content: data.content,
+                sender,
+                content,
             });
             const savedMessage = await newMessage.save();
+
+            // Gửi tin nhắn đến tất cả các user
             io.emit("receive_message", savedMessage);
         } catch (err) {
             console.error("Error saving message:", err);
         }
     });
 
+    // Khi người dùng ngắt kết nối
     socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
+        const username = onlineUsers.get(socket.id);
+        if (username) {
+            onlineUsers.delete(socket.id); // Xóa user khỏi danh sách online
+            console.log(`${username} left the chat`);
+            io.emit("update_user_list", Array.from(onlineUsers.values())); // Gửi danh sách user cập nhật
+        }
     });
 });
 

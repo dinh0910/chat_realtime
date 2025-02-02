@@ -1,19 +1,19 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 
-import { AuthCenteredLayout } from '../../layouts/auth-centered';
+import { MainLayout } from 'src/layouts/main';
 
-import { SplashScreen } from '../../components/loading-screen';
+import { SplashScreen } from 'src/components/loading-screen';
 
 import { authRoutes } from './auth';
-// import { mainRoutes } from './main';
-// import { authDemoRoutes } from './auth-demo';
-// import { dashboardRoutes } from './dashboard';
-// import { componentsRoutes } from './components';
+import { mainRoutes } from './main';
+import { authDemoRoutes } from './auth-demo';
+import { dashboardRoutes } from './dashboard';
+import { componentsRoutes } from './components';
 
 // ----------------------------------------------------------------------
 
-const HomePage = lazy(() => import('../../pages/auth/sign-in'));
+const HomePage = lazy(() => import('src/pages/home'));
 
 export function Router() {
   return useRoutes([
@@ -25,25 +25,25 @@ export function Router() {
        */
       element: (
         <Suspense fallback={<SplashScreen />}>
-          <AuthCenteredLayout>
+          <MainLayout>
             <HomePage />
-          </AuthCenteredLayout>
+          </MainLayout>
         </Suspense>
       ),
     },
 
     // Auth
     ...authRoutes,
-    // ...authDemoRoutes,
+    ...authDemoRoutes,
 
     // Dashboard
-    // ...dashboardRoutes,
+    ...dashboardRoutes,
 
     // Main
-    // ...mainRoutes,
+    ...mainRoutes,
 
     // Components
-    // ...componentsRoutes,
+    ...componentsRoutes,
 
     // No match
     { path: '*', element: <Navigate to="/404" replace /> },

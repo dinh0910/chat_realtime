@@ -6,8 +6,8 @@ import { CONFIG } from 'src/config-global';
 import { stylesMode } from 'src/theme/styles';
 
 import { Main } from './main';
-import { HeaderBase } from 'src/core/header-base';
-import { LayoutSection } from 'src/core/layout-section';
+import { HeaderBase } from '../core/header-base';
+import { LayoutSection } from '../core/layout-section';
 
 // ----------------------------------------------------------------------
 

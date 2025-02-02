@@ -1,8 +1,8 @@
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 
-import { CONFIG } from '../../../config-global';
-import { setFont, varAlpha, stylesMode } from '../../../theme/styles';
+import { CONFIG } from 'src/config-global';
+import { setFont, varAlpha, stylesMode } from 'src/theme/styles';
 
 import { Block } from './styles';
 import { SvgColor } from '../../svg-color';

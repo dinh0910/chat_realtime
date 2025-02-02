@@ -1,6 +1,9 @@
 {
 	"folders": [
 		{
+			"path": "chat-service"
+		},
+		{
 			"path": "backend"
 		},
 		{

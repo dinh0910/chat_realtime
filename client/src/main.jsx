@@ -1,11 +1,23 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
-// import AppChat from './AppChat.jsx'
+import ReactDOM from 'react-dom/client';
+import { Suspense, StrictMode } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 
-createRoot(document.getElementById('root')).render(
+import App from './app';
+import { CONFIG } from './config-global';
+
+// ----------------------------------------------------------------------
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <HelmetProvider>
+      <BrowserRouter basename={CONFIG.site.basePath}>
+        <Suspense>
+          <App />
+        </Suspense>
+      </BrowserRouter>
+    </HelmetProvider>
+  </StrictMode>
+);

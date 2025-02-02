@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// import 'global.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+// ----------------------------------------------------------------------
+
+import { Router } from './routes/sections';
+
+// import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
+
+import { CONFIG } from './config-global';
+import { LocalizationProvider } from './locales';
+import { I18nProvider } from './locales/i18n-provider';
+import { ThemeProvider } from './theme/theme-provider';
+
+// import { Snackbar } from './components/snackbar';
+// import { ProgressBar } from './components/progress-bar';
+// import { MotionLazy } from './components/animate/motion-lazy';
+// import { SettingsDrawer, defaultSettings, SettingsProvider } from './components/settings';
+
+// import { CheckoutProvider } from 'src/sections/checkout/context';
+
+// import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
+// import { AuthProvider as Auth0AuthProvider } from 'src/auth/context/auth0';
+// import { AuthProvider as AmplifyAuthProvider } from 'src/auth/context/amplify';
+// import { AuthProvider as SupabaseAuthProvider } from 'src/auth/context/supabase';
+// import { AuthProvider as FirebaseAuthProvider } from 'src/auth/context/firebase';
+
+// ----------------------------------------------------------------------
+
+const AuthProvider =
+  (CONFIG.auth.method === 'amplify' && AmplifyAuthProvider) ||
+  (CONFIG.auth.method === 'firebase' && FirebaseAuthProvider) ||
+  (CONFIG.auth.method === 'supabase' && SupabaseAuthProvider) ||
+  (CONFIG.auth.method === 'auth0' && Auth0AuthProvider) ||
+  JwtAuthProvider;
+
+export default function App() {
+  useScrollToTop();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <I18nProvider>
+      <LocalizationProvider>
+        {/* <AuthProvider> */}
+        <SettingsProvider settings={defaultSettings}>
+          <ThemeProvider>
+            {/* <MotionLazy> */}
+            {/* <CheckoutProvider> */}
+            {/* <Snackbar />
+                  <ProgressBar />
+                  <SettingsDrawer /> */}
+            <Router />
+            {/* </CheckoutProvider> */}
+            {/* </MotionLazy> */}
+          </ThemeProvider>
+        </SettingsProvider>
+        {/* </AuthProvider> */}
+      </LocalizationProvider>
+    </I18nProvider>
+  );
 }
-
-export default App

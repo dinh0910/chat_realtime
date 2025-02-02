@@ -17,7 +17,17 @@ export default [
         sourceType: 'module',
       },
     },
-    settings: { react: { version: '18.3' } },
+    settings: {
+      react: {
+        version: 'detect'
+      },
+      'import/resolver': {
+        alias: {
+          map: [['src', './src']], // Cấu hình path alias cho ESLint
+          extensions: ['.js', '.jsx'],
+        },
+      },
+    },
     plugins: {
       react,
       'react-hooks': reactHooks,
